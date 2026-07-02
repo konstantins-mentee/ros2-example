@@ -1,0 +1,22 @@
+name: ros2-example
+
+# Runs the prebuilt dev image (ros2-jazzy-arm64:dev) and maps the whole
+# ~/Projects tree in as the colcon workspace source, so every project under
+# ~/Projects (including this one) is discoverable by `colcon build`.
+services:
+  ros2-example:
+    image: ros2-jazzy-arm64:dev
+    platform: linux/arm64
+    container_name: ros2-example
+    stdin_open: true          # -i
+    tty: true                 # -t
+    network_mode: host        # simplest DDS discovery on Linux hosts
+    ipc: host                 # shared-memory transport for Fast DDS
+    environment:
+      - ROS_DOMAIN_ID=0
+    volumes:
+      # '..' is ~/Projects (resolved relative to this compose file) ->
+      # mounted as the overlay workspace's src/.
+      - ../:/home/ros/ws/src
+    working_dir: /home/ros/ws
+    command: bash
