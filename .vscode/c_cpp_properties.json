@@ -1,0 +1,18 @@
+{
+  "version": 4,
+  "configurations": [
+    {
+      "name": "ROS 2 Jazzy (arm64)",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "/opt/ros2_jazzy/install/**",
+        "/home/ros/ws/install/**",
+        "/usr/include/**"
+      ],
+      "compilerPath": "/usr/bin/g++",
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "linux-gcc-arm64"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug hello (gdb)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "/home/ros/ws/install/ros2_example/lib/ros2_example/hello",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "/home/ros/ws",
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "preLaunchTask": "colcon build",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "cwd": "/home/ros/ws"
+  },
+  "tasks": [
+    {
+      "label": "colcon build",
+      "type": "shell",
+      "command": "colcon build --packages-select ros2_example --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$gcc"],
+      "detail": "Build the ros2_example package with colcon"
+    },
+    {
+      "label": "run hello",
+      "type": "shell",
+      "command": "source /home/ros/ws/install/setup.bash && ros2 run ros2_example hello",
+      "dependsOn": "colcon build",
+      "problemMatcher": [],
+      "detail": "Build then run the hello node"
+    },
+    {
+      "label": "clean",
+      "type": "shell",
+      "command": "rm -rf /home/ros/ws/build /home/ros/ws/install /home/ros/ws/log",
+      "problemMatcher": []
+    }
+  ]
+}

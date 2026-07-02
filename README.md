@@ -68,3 +68,43 @@ package you drop under `~/Projects` is also picked up by `colcon build`.
   and, once built, your overlay (`/home/ros/ws/install`).
 - Build output (`build/`, `install/`, `log/`) lands under `~/Projects` on the
   host and is git-ignored.
+
+## Develop inside the container with VS Code
+
+This project ships a Dev Container so VS Code runs *inside* `ros2-jazzy-arm64:dev`
+with the full ROS 2 toolchain, IntelliSense, build tasks and a debugger.
+
+Prerequisites: [VS Code](https://code.visualstudio.com/) + the **Dev Containers**
+extension (`ms-vscode-remote.remote-containers`), Docker running, and the
+`ros2-jazzy-arm64:dev` image built.
+
+Steps:
+
+1. `code ~/Projects/ros2-example`
+2. Command Palette → **Dev Containers: Reopen in Container** (VS Code reads
+   `.devcontainer/devcontainer.json`, starts the image, and installs the C++,
+   CMake, Python and ROS extensions in the container).
+3. VS Code opens at `/home/ros/ws/src/ros2-example`, with all of `~/Projects`
+   mounted at `/home/ros/ws/src`.
+
+Inside the container:
+
+- **Build:** `Ctrl/Cmd+Shift+B` (runs the `colcon build` task in `/home/ros/ws`).
+- **Run:** Command Palette → *Tasks: Run Task* → **run hello** → logs the message.
+- **Debug:** open `src/hello_node.cpp`, press `F5` (*Debug hello (gdb)*). It
+  builds first, then launches the executable under gdb. The **ROS** extension
+  auto-sources the workspace so the node's shared libraries resolve; if you
+  debug without it, launch from the integrated terminal after
+  `source install/setup.bash` instead.
+
+What the config does:
+
+- `.devcontainer/devcontainer.json` — uses the `ros2-jazzy-arm64:dev` image,
+  `--platform=linux/arm64`, host networking + IPC, runs as user `ros`, and
+  mounts `${localWorkspaceFolder}/..` (i.e. `~/Projects`) at `/home/ros/ws/src`.
+- `.vscode/tasks.json` — `colcon build`, `run hello`, and `clean` tasks.
+- `.vscode/launch.json` — gdb debug config for the `hello` executable.
+- `.vscode/c_cpp_properties.json` + `settings.json` — IntelliSense include paths
+  pointing at the underlay (`/opt/ros2_jazzy/install`) and overlay
+  (`/home/ros/ws/install`); C++17; `cmake.configureOnOpen` disabled so VS Code
+  doesn't try to configure against the host toolchain.
