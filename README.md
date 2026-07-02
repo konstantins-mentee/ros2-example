@@ -44,6 +44,26 @@ Expected output:
 [INFO] [hello_node]: Hello from ros2-example (rclcpp / Jazzy)!
 ```
 
+## Executables
+
+The package builds two targets:
+
+- **`hello`** — minimal node that logs a hello message and exits.
+- **`zero_copy_pubsub`** — a producer/consumer demo. The producer publishes a
+  `std_msgs/Float64` at 10 Hz using `borrow_loaned_message()` (zero-copy loaned
+  messages), and the consumer logs each value. Both nodes run in one
+  `SingleThreadedExecutor`. Run it (Ctrl+C to stop):
+
+  ```bash
+  ros2 run ros2_example zero_copy_pubsub
+  ```
+
+  Note on zero-copy: loaned messages only avoid a copy when the middleware
+  supports shared memory (e.g. Fast DDS with SHM, or Iceoryx). Otherwise the
+  call transparently falls back to a normal heap allocation — the code is
+  identical either way. The container already runs with `--ipc=host` so the
+  shared-memory transport can work.
+
 ## Interactive workflow
 
 ```bash

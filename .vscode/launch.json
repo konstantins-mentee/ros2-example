@@ -12,13 +12,37 @@
       "externalConsole": false,
       "MIMode": "gdb",
       "miDebuggerPath": "/usr/bin/gdb",
-      "preLaunchTask": "colcon build",
+      "preLaunchTask": "colcon build (Debug)",
       "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
+        { "description": "Enable pretty-printing for gdb", "text": "-enable-pretty-printing", "ignoreFailures": true }
+      ]
+    },
+    {
+      "name": "Debug zero_copy_pubsub (gdb)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "/home/ros/ws/install/ros2_example/lib/ros2_example/zero_copy_pubsub",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "/home/ros/ws",
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "preLaunchTask": "colcon build (Debug)",
+      "setupCommands": [
+        { "description": "Enable pretty-printing for gdb", "text": "-enable-pretty-printing", "ignoreFailures": true }
+      ]
+    },
+    {
+      "name": "Attach to running ros2 node (gdb)",
+      "type": "cppdbg",
+      "request": "attach",
+      "program": "/home/ros/ws/install/ros2_example/lib/ros2_example/zero_copy_pubsub",
+      "processId": "${command:pickProcess}",
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "setupCommands": [
+        { "description": "Enable pretty-printing for gdb", "text": "-enable-pretty-printing", "ignoreFailures": true }
       ]
     }
   ]

@@ -1,8 +1,6 @@
 {
   "version": "2.0.0",
-  "options": {
-    "cwd": "/home/ros/ws"
-  },
+  "options": { "cwd": "/home/ros/ws" },
   "tasks": [
     {
       "label": "colcon build",
@@ -10,15 +8,29 @@
       "command": "colcon build --packages-select ros2_example --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo",
       "group": { "kind": "build", "isDefault": true },
       "problemMatcher": ["$gcc"],
-      "detail": "Build the ros2_example package with colcon"
+      "detail": "Build the ros2_example package (optimized + debug info)"
+    },
+    {
+      "label": "colcon build (Debug)",
+      "type": "shell",
+      "command": "colcon build --packages-select ros2_example --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug",
+      "problemMatcher": ["$gcc"],
+      "detail": "Unoptimized build for clean single-stepping in gdb"
     },
     {
       "label": "run hello",
       "type": "shell",
       "command": "source /home/ros/ws/install/setup.bash && ros2 run ros2_example hello",
       "dependsOn": "colcon build",
+      "problemMatcher": []
+    },
+    {
+      "label": "run zero_copy_pubsub",
+      "type": "shell",
+      "command": "source /home/ros/ws/install/setup.bash && ros2 run ros2_example zero_copy_pubsub",
+      "dependsOn": "colcon build",
       "problemMatcher": [],
-      "detail": "Build then run the hello node"
+      "detail": "Build then run the producer/consumer demo (Ctrl+C to stop)"
     },
     {
       "label": "clean",
