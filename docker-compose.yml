@@ -1,13 +1,19 @@
 name: ros2-example
 
-# Runs the prebuilt dev image (ros2-jazzy-arm64:dev) and maps the whole
-# ~/Projects tree in as the colcon workspace source, so every project under
-# ~/Projects (including this one) is discoverable by `colcon build`.
+# The image + platform are chosen automatically for the host architecture by
+# .devcontainer/select-image.sh, which writes them to .env (next to this file):
+#   x86_64  -> nvcr.io/nvidia/isaac/ros:...humble...  (linux/amd64)
+#   aarch64 -> ros2-jazzy-arm64:dev                   (linux/arm64)
+# The defaults below keep `docker compose` working on x86_64 even without .env.
+#
+# ~/Projects (this file's parent) is mounted as the colcon workspace src/, so
+# every ROS 2 package under ~/Projects is discoverable by `colcon build`.
 services:
   ros2-example:
-    image: ros2-jazzy-arm64:dev
-    platform: linux/arm64
+    image: ${ROS2_IMAGE:-nvcr.io/nvidia/isaac/ros:x86_64-ros2_humble_f247dd1051869171c3fc53bb35f6b907}
+    platform: ${ROS2_PLATFORM:-linux/amd64}
     container_name: ros2-example
+    user: root
     stdin_open: true          # -i
     tty: true                 # -t
     network_mode: host        # simplest DDS discovery on Linux hosts
@@ -15,8 +21,6 @@ services:
     environment:
       - ROS_DOMAIN_ID=0
     volumes:
-      # '..' is ~/Projects (resolved relative to this compose file) ->
-      # mounted as the overlay workspace's src/.
-      - ../:/home/ros/ws/src
-    working_dir: /home/ros/ws
+      - ../:/root/ws/src
+    working_dir: /root/ws
     command: bash

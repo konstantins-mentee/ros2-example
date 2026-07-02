@@ -1,24 +1,19 @@
 {
-  "name": "ros2-example (Jazzy, arm64)",
+  "name": "ros2-example (auto: Humble/x86_64 or Jazzy/arm64)",
 
-  "image": "ros2-jazzy-arm64:dev",
+  // Image + platform are selected for the host arch by select-image.sh (below)
+  // and injected into docker-compose.yml via .env. See docker-compose.yml.
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "ros2-example",
+  "workspaceFolder": "/root/ws/src/ros2-example",
+  "remoteUser": "root",
 
-  "runArgs": [
-    "--platform=linux/arm64",
-    "--network=host",
-    "--ipc=host",
-    "--name=ros2-example-devcontainer"
-  ],
+  // Runs on the HOST before the container is created: detects uname -m and
+  // writes ../.env so compose pulls the right image/platform.
+  "initializeCommand": "bash .devcontainer/select-image.sh",
 
-  "containerUser": "ros",
-  "remoteUser": "ros",
-
-  "containerEnv": {
-    "ROS_DOMAIN_ID": "0"
-  },
-
-  "workspaceFolder": "/home/ros/ws/src/ros2-example",
-  "workspaceMount": "source=${localWorkspaceFolder}/..,target=/home/ros/ws/src,type=bind,consistency=cached",
+  // Runs INSIDE the container: source ROS (whichever distro) in every shell.
+  "postCreateCommand": "bash .devcontainer/setup-shell.sh",
 
   "customizations": {
     "vscode": {
@@ -32,17 +27,7 @@
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",
-        "cmake.configureOnOpen": false,
-        "C_Cpp.default.cppStandard": "c++17",
-        "C_Cpp.default.intelliSenseMode": "linux-gcc-arm64",
-        "C_Cpp.default.compilerPath": "/usr/bin/g++",
-        "C_Cpp.default.includePath": [
-          "${workspaceFolder}/**",
-          "/opt/ros2_jazzy/install/**",
-          "/home/ros/ws/install/**",
-          "/usr/include/**"
-        ],
-        "ros.distro": "jazzy"
+        "cmake.configureOnOpen": false
       }
     }
   }
