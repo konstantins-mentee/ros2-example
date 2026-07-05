@@ -11,8 +11,13 @@
 
   <!-- Main client library dependency -->
   <depend>rclcpp</depend>
-  <!-- Standard messages (Float64) for the zero-copy pub/sub demo -->
+  <!-- Component registration + component_container executables -->
+  <depend>rclcpp_components</depend>
+  <!-- Standard messages (Float64, Int32) for the demos -->
   <depend>std_msgs</depend>
+
+  <!-- Python launch tooling used by launch/counter.launch.py -->
+  <exec_depend>launch_ros</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

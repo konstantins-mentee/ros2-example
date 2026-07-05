@@ -1,0 +1,7 @@
+# Parameters for the counter component / node.
+# Loaded via the launch file, or directly:
+#   ros2 run ros2_example counter_main --ros-args \
+#     --params-file <share>/ros2_example/config/counter_params.yaml
+counter_component:
+  ros__parameters:
+    rate_hz: 5.0

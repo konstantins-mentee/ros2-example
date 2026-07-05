@@ -46,7 +46,7 @@ Expected output:
 
 ## Executables
 
-The package builds two targets:
+The package builds these targets:
 
 - **`hello`** — minimal node that logs a hello message and exits.
 - **`zero_copy_pubsub`** — a producer/consumer demo. The producer publishes a
@@ -56,6 +56,29 @@ The package builds two targets:
 
   ```bash
   ros2 run ros2_example zero_copy_pubsub
+  ```
+
+- **`counter_component`** (library) + **`counter_component_node`** /
+  **`counter_main`** (executables) — the ROS 2 *component* pattern. The counter
+  logic lives in a `SHARED` library (`libcounter_component.so`), registered as a
+  loadable component via `rclcpp_components_register_node()`. It publishes an
+  incrementing `std_msgs/Int32` on `counter` at a configurable `rate_hz`.
+
+  ```bash
+  # standalone executable that links the library directly:
+  ros2 run ros2_example counter_main
+
+  # the executable auto-generated from the component registration,
+  # with a parameter override:
+  ros2 run ros2_example counter_component_node --ros-args -p rate_hz:=10.0
+
+  # or load it into a component container via the installed launch file
+  # (uses config/counter_params.yaml):
+  ros2 launch ros2_example counter.launch.py
+
+  # or hot-load it into a running container:
+  ros2 run rclcpp_components component_container_mt &
+  ros2 component load /ComponentManager ros2_example ros2_example::CounterComponent
   ```
 
   Note on zero-copy: loaned messages only avoid a copy when the middleware
