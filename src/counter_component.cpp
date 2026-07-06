@@ -1,6 +1,6 @@
 // Implementation of CounterComponent, plus the macro that registers it as a
 // dynamically-loadable ROS 2 component.
-#include "ros2_example/counter_component.hpp"
+#include "../include/ros2_example/counter_component.hpp"
 
 #include <chrono>
 
