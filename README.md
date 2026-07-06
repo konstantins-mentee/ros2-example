@@ -63,29 +63,112 @@ The package builds these targets:
   logic lives in a `SHARED` library (`libcounter_component.so`), registered as a
   loadable component via `rclcpp_components_register_node()`. It publishes an
   incrementing `std_msgs/Int32` on `counter` at a configurable `rate_hz`.
-
-  ```bash
-  # standalone executable that links the library directly:
-  ros2 run ros2_example counter_main
-
-  # the executable auto-generated from the component registration,
-  # with a parameter override:
-  ros2 run ros2_example counter_component_node --ros-args -p rate_hz:=10.0
-
-  # or load it into a component container via the installed launch file
-  # (uses config/counter_params.yaml):
-  ros2 launch ros2_example counter.launch.py
-
-  # or hot-load it into a running container:
-  ros2 run rclcpp_components component_container_mt &
-  ros2 component load /ComponentManager ros2_example ros2_example::CounterComponent
-  ```
+  See [Running the component example](#running-the-component-example) below.
 
   Note on zero-copy: loaned messages only avoid a copy when the middleware
   supports shared memory (e.g. Fast DDS with SHM, or Iceoryx). Otherwise the
   call transparently falls back to a normal heap allocation — the code is
   identical either way. The container already runs with `--ipc=host` so the
   shared-memory transport can work.
+
+## Running the component example
+
+The counter is built three ways. **The first two are plain native executables**
+— an ordinary ELF binary you can run directly, no component manager involved.
+The third is the "true component" path: load the shared library into a running
+container process at runtime.
+
+All commands assume you have already built and sourced the overlay in the
+container:
+
+```bash
+colcon build --packages-select ros2_example
+source install/setup.bash
+```
+
+(For a copy-paste one-liner that does build + source + run in a single
+throwaway container, see [One-shot native run](#one-shot-native-run) below —
+needed because the `install/` tree lives at `/home/ros/ws`, which is **not**
+mounted back to the host, so it must be built and used in the same
+`docker run`.)
+
+### 1. `counter_main` — your own native executable
+
+The hand-written `main()` in `src/counter_main.cpp` that links the library
+directly (`target_link_libraries`). It's a normal binary, so either of these
+runs the **same** program — pick one:
+
+```bash
+ros2 run ros2_example counter_main                          # via the ros2 CLI
+./install/ros2_example/lib/ros2_example/counter_main        # by path, identical
+```
+
+`ros2 run PKG EXE` just locates the executable inside the package's
+`lib/ros2_example/` and execs it — there is nothing extra happening versus
+running the file directly. Use `ros2 run`; the raw path is only shown to make
+the point that it's an ordinary native binary.
+
+### 2. `counter_component_node` — native executable, auto-generated
+
+`rclcpp_components_register_node(... EXECUTABLE counter_component_node)`
+generates a thin binary that loads the component into its own process for you.
+Also fully native, and it takes parameters:
+
+```bash
+ros2 run ros2_example counter_component_node --ros-args -p rate_hz:=10.0
+```
+
+`counter_main` (which you wrote) and `counter_component_node` (generated from
+the `RCLCPP_COMPONENTS_REGISTER_NODE` macro) run the exact same library logic —
+the only difference is who wrote the `main()`.
+
+### 3. Load into a component container (the "real" component use)
+
+Only needed when you actually want runtime composition — e.g. several
+components sharing one process for zero-copy intra-process comms. Not native
+standalone; the library is loaded at runtime.
+
+```bash
+# terminal A: start an empty container process
+ros2 run rclcpp_components component_container_mt
+
+# terminal B: hot-load the component into it, then inspect
+ros2 component load /ComponentManager ros2_example ros2_example::CounterComponent
+ros2 component list
+```
+
+Or declaratively — the launch file starts a container **and** loads the
+component with parameters from `config/counter_params.yaml` (`rate_hz: 5.0`):
+
+```bash
+ros2 launch ros2_example counter.launch.py
+```
+
+### One-shot native run
+
+From the host, build + source + run a native executable in one throwaway
+container:
+
+```bash
+cd ~/Projects/ros2-example
+PROJECTS_DIR="$(cd .. && pwd)"
+docker run --rm -it --platform=linux/arm64 --network host --ipc host \
+  -v "${PROJECTS_DIR}:/home/ros/ws/src" -w /home/ros/ws \
+  ros2-jazzy-arm64:dev bash -lc '
+    colcon build --packages-select ros2_example
+    source install/setup.bash
+    ros2 run ros2_example counter_main       # swap for any command above
+  '
+```
+
+### Observing the output
+
+While any of the above is running, from another sourced shell:
+
+```bash
+ros2 topic echo /counter          # see the published std_msgs/Int32
+ros2 topic hz /counter            # confirm the rate matches rate_hz
+```
 
 ## Interactive workflow
 
